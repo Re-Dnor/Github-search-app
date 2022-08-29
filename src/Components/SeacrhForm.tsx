@@ -5,9 +5,10 @@ import {
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { useDispatch } from 'react-redux';
 import { fetchUsers } from '../store/github-slice';
+import { AppDispatch } from '../store/store';
 
 function SearchForm() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [inputSearch, setInputSearch] = useState('Re-Dnor');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -16,8 +17,7 @@ function SearchForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    console.log(inputSearch);
-    dispatch(fetchUsers(inputSearch) as any);
+    dispatch(fetchUsers(inputSearch));
   };
 
   return (

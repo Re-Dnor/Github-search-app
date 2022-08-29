@@ -6,7 +6,7 @@ export const fetchUsers = createAsyncThunk(
   // if you type your function argument here
   async (user: string) => {
     const URL = 'https://api.github.com/';
-    const response = await fetch(`${URL}search/users?q=${user}&per_page=20`);
+    const response = await fetch(`${URL}search/users?q=${user}&per_page=5`);
     return response.json();
   },
 );
@@ -30,10 +30,12 @@ export const githubSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchUsers.pending, (state, action) => {
       console.log(state, action);
+      console.log('Pending');
     });
 
     builder.addCase(fetchUsers.fulfilled, (state, action) => {
       console.log(action.payload);
+      console.log('Fullfilled');
     });
     builder.addCase(fetchUsers.rejected, (state, action) => {
       console.log(state, action);
