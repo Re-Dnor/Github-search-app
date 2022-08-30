@@ -1,28 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  CssBaseline, Box, Avatar, Container, Typography, TextField, Button, ButtonGroup,
+  CssBaseline, Box, Avatar, Typography, TextField, Button, ButtonGroup, Autocomplete,
 } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import { useDispatch } from 'react-redux';
-import { fetchUsers } from '../store/github-slice';
-import { AppDispatch } from '../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers, fetchCurrentUser, changeSelected } from '../store/github-slice';
+import { AppDispatch, RootState } from '../store/store';
+import useDebounce from '../hooks/useDebounce';
 
 function SearchForm() {
   const dispatch = useDispatch<AppDispatch>();
-  const [inputSearch, setInputSearch] = useState('Re-Dnor');
+  const [inputSearch, setInputSearch] = useState('');
+  const debounceSearch = useDebounce(inputSearch, 300);
+  const { users } = useSelector((state: RootState) => state.github);
+  const usersName = users.map((user) => user.login);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setInputSearch(e.target.value);
+  const handleChange = (event: React.SyntheticEvent<Element, Event>, inputValue: string | null): void => {
+    if (inputValue) {
+      setInputSearch(inputValue);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    dispatch(fetchUsers(inputSearch));
+    if (inputSearch) {
+      const currentUrl = users.filter((user) => user.login === inputSearch)[0].url;
+      dispatch(changeSelected(true));
+      dispatch(fetchCurrentUser(currentUrl));
+    }
   };
 
+  useEffect(() => {
+    if (inputSearch) {
+      dispatch(fetchUsers(debounceSearch));
+    }
+  }, [debounceSearch]);
+
   return (
-    // <Autocomplete></Autocomplete>
-    <Container component="main" maxWidth="xl">
+    <>
       <CssBaseline />
       <Box
         sx={{
@@ -47,16 +62,25 @@ function SearchForm() {
           component="form"
           onSubmit={handleSubmit}
         >
-          <TextField
-            margin="normal"
-            required
-            id="search"
-            label="Users"
-            name="search"
-            autoComplete="search"
-            value={inputSearch}
-            autoFocus
+          <Autocomplete
+            id="combo-box-demo"
+            value={inputSearch || null}
             onChange={handleChange}
+            inputValue={inputSearch}
+            onInputChange={(event, newInputValue) => {
+              setInputSearch(newInputValue);
+            }}
+            options={usersName}
+            sx={{ width: 300 }}
+            renderInput={(params) => (
+              <TextField
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...params}
+                margin="normal"
+                autoFocus
+                label="Users"
+              />
+            )}
           />
           <Button
             type="submit"
@@ -71,7 +95,7 @@ function SearchForm() {
           </Button>
         </ButtonGroup>
       </Box>
-    </Container>
+    </>
   );
 }
 
