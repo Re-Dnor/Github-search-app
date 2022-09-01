@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
-  CssBaseline, Box, Avatar, Typography, TextField, Button, ButtonGroup, Autocomplete,
+  CssBaseline, Box, Avatar, Typography, TextField, Button, ButtonGroup, Autocomplete, Dialog, DialogTitle,
+  DialogContent, DialogContentText, DialogActions,
 } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers, fetchCurrentUser, changeSelected } from '../store/github-slice';
+import {
+  fetchUsers, fetchCurrentUser, changeSelected, closeLimit,
+} from '../store/github-slice';
 import { AppDispatch, RootState } from '../store/store';
 import useDebounce from '../hooks/useDebounce';
 
 function SearchForm() {
   const dispatch = useDispatch<AppDispatch>();
   const [inputSearch, setInputSearch] = useState('');
-  const debounceSearch = useDebounce(inputSearch, 300);
-  const { users } = useSelector((state: RootState) => state.github);
+  const debounceSearch = useDebounce(inputSearch, 400);
+  const { users, limit, errorMessage } = useSelector((state: RootState) => state.github);
   const usersName = users.map((user) => user.login);
 
   const handleChange = (event: React.SyntheticEvent<Element, Event>, inputValue: string | null): void => {
@@ -78,7 +81,7 @@ function SearchForm() {
                 {...params}
                 margin="normal"
                 autoFocus
-                label="Users"
+                label="Select user"
               />
             )}
           />
@@ -94,6 +97,26 @@ function SearchForm() {
             Click
           </Button>
         </ButtonGroup>
+        <Dialog
+          open={limit}
+          onClose={() => dispatch(closeLimit())}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            API limit
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {errorMessage}
+              {' '}
+              Wait a few minutes.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => dispatch(closeLimit())}>Ok</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </>
   );
