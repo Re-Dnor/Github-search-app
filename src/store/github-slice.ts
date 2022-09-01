@@ -39,6 +39,8 @@ export interface GithubState {
   selected: boolean;
   currentUser: ICurrentUser;
   loader: boolean;
+  limit: boolean;
+  errorMessage: string;
 }
 
 const initialState: GithubState = {
@@ -55,6 +57,8 @@ const initialState: GithubState = {
     avatar: '',
   },
   loader: false,
+  limit: false,
+  errorMessage: '',
 };
 
 export const githubSlice = createSlice({
@@ -64,19 +68,28 @@ export const githubSlice = createSlice({
     changeSelected: (state, action) => {
       state.selected = action.payload;
     },
+    closeLimit: (state) => {
+      state.limit = false;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchUsers.fulfilled, (state, action) => {
-      (action.payload.items as any[]).forEach((item) => {
-        const { login, url } = item;
+      if (action.payload.message) {
+        state.errorMessage = action.payload.message;
+        state.limit = true;
+      } else {
+        (action.payload.items as any[]).forEach((item) => {
+          const { login, url } = item;
+          const newUser: IUser = {
+            login,
+            url,
+          };
 
-        const newUser: IUser = {
-          login,
-          url,
-        };
-
-        state.users.push(newUser);
-      });
+          state.users.push(newUser);
+        });
+        state.limit = false;
+        state.errorMessage = '';
+      }
     });
     builder.addCase(fetchUsers.rejected, (state, action) => {
       console.log('___ERRROR');
@@ -113,5 +126,5 @@ export const githubSlice = createSlice({
   },
 });
 
-export const { changeSelected } = githubSlice.actions;
+export const { changeSelected, closeLimit } = githubSlice.actions;
 export default githubSlice.reducer;
