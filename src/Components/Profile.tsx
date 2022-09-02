@@ -7,7 +7,8 @@ import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import { RootState } from '../store/store';
 
 function Profile() {
-  const { currentUser, loader, reposList } = useSelector((state: RootState) => state.github);
+  const { currentUser } = useSelector((state: RootState) => state.users);
+  const { loader, reposList } = useSelector((state: RootState) => state.repos);
   return (
     <div>
       {

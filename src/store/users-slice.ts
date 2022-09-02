@@ -17,25 +17,10 @@ export const fetchCurrentUser = createAsyncThunk(
   },
 );
 
-export const fetchCurrentRepos = createAsyncThunk(
-  'github/fetchCurrentRepos',
-  async (url: string) => {
-    const response = await fetch(url);
-    return response.json();
-  },
-);
-
 interface IUser {
   login: string;
   url: string;
   repos: string;
-}
-
-interface IRepos {
-  name: string;
-  url: string;
-  data: string;
-  id: number;
 }
 
 interface ICurrentUser {
@@ -51,17 +36,14 @@ interface ICurrentUser {
 
 export interface GithubState {
   users: IUser[];
-  reposList: IRepos[];
   selected: boolean;
   currentUser: ICurrentUser;
-  loader: boolean;
   limit: boolean;
   errorMessage: string;
 }
 
 const initialState: GithubState = {
   users: [],
-  reposList: [],
   selected: false,
   currentUser: {
     name: '',
@@ -73,12 +55,11 @@ const initialState: GithubState = {
     following: '',
     avatar: '',
   },
-  loader: false,
   limit: false,
   errorMessage: '',
 };
 
-export const githubSlice = createSlice({
+export const usersSlice = createSlice({
   name: 'github',
   initialState,
   reducers: {
@@ -90,6 +71,7 @@ export const githubSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // ______FETCH ALL USERS_____
     builder.addCase(fetchUsers.fulfilled, (state, action) => {
       if (action.payload.message) {
         state.errorMessage = action.payload.message;
@@ -114,12 +96,9 @@ export const githubSlice = createSlice({
       console.log('___ERRROR');
       console.log(state, action.payload);
     });
+
     // _____FETCH CURRENT USER_____
-    builder.addCase(fetchCurrentUser.pending, (state) => {
-      state.loader = true;
-    });
     builder.addCase(fetchCurrentUser.fulfilled, (state, action) => {
-      console.log(action.payload);
       const {
         location, followers, following, name, login, bio, company,
       } = action.payload;
@@ -135,40 +114,14 @@ export const githubSlice = createSlice({
         avatar,
       };
       state.currentUser = currentUser;
-      state.loader = false;
       state.users = [];
     });
     builder.addCase(fetchCurrentUser.rejected, (state, action) => {
       console.log('___ERRROR');
       console.log(state, action.payload);
     });
-
-    // _____FETCH CURRENT REPOS ____
-    builder.addCase(fetchCurrentRepos.pending, (state) => {
-      state.loader = true;
-    });
-    builder.addCase(fetchCurrentRepos.fulfilled, (state, action) => {
-      (action.payload as any[]).forEach((rep) => {
-        const data = rep.pushed_at;
-        const url = rep.html_url;
-        const { name, id } = rep;
-
-        const repItem = {
-          data,
-          url,
-          name,
-          id,
-        };
-
-        state.reposList.push(repItem);
-      });
-    });
-    builder.addCase(fetchCurrentRepos.rejected, (state, action) => {
-      console.log('___ERRROR');
-      console.log(state, action.payload);
-    });
   },
 });
 
-export const { changeSelected, closeLimit } = githubSlice.actions;
-export default githubSlice.reducer;
+export const { changeSelected, closeLimit } = usersSlice.actions;
+export default usersSlice.reducer;

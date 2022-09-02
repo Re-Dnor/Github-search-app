@@ -4,7 +4,7 @@ import { RootState } from '../store/store';
 import Profile from './Profile';
 
 function Info() {
-  const { selected } = useSelector((state: RootState) => state.github);
+  const { selected } = useSelector((state: RootState) => state.users);
   return (
     <div>
       {
