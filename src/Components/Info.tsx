@@ -9,7 +9,9 @@ function Info() {
     <div>
       {
       selected
-      && <Profile />
+      && (
+        <Profile />
+      )
       }
     </div>
   );

@@ -6,7 +6,7 @@ import {
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  fetchUsers, fetchCurrentUser, changeSelected, closeLimit,
+  fetchUsers, fetchCurrentUser, changeSelected, closeLimit, fetchCurrentRepos,
 } from '../store/github-slice';
 import { AppDispatch, RootState } from '../store/store';
 import useDebounce from '../hooks/useDebounce';
@@ -27,9 +27,10 @@ function SearchForm() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (inputSearch) {
-      const currentUrl = users.filter((user) => user.login === inputSearch)[0].url;
+      const { repos, url } = users.filter((user) => user.login === inputSearch)[0];
       dispatch(changeSelected(true));
-      dispatch(fetchCurrentUser(currentUrl));
+      dispatch(fetchCurrentUser(url));
+      dispatch(fetchCurrentRepos(repos));
     }
   };
 
