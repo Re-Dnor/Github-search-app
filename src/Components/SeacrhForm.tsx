@@ -6,9 +6,9 @@ import {
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  fetchUsers, fetchCurrentUser, changeSelected, closeLimit,
+  fetchUsers, fetchCurrentUser, changeSelected, closeLimit, resetUsers,
 } from '../store/users-slice';
-import { fetchCurrentRepos } from '../store/repos-slice';
+import { fetchCurrentRepos, resetRepos } from '../store/repos-slice';
 import { AppDispatch, RootState } from '../store/store';
 import useDebounce from '../hooks/useDebounce';
 
@@ -35,6 +35,12 @@ function SearchForm() {
     }
   };
 
+  const getStarted = () => {
+    dispatch(resetUsers());
+    dispatch(resetRepos());
+    setInputSearch('');
+  };
+
   useEffect(() => {
     if (inputSearch) {
       dispatch(fetchUsers(debounceSearch));
@@ -52,9 +58,13 @@ function SearchForm() {
           alignItems: 'center',
         }}
       >
-        <Avatar sx={{
-          m: 1, bgcolor: 'primary.main',
-        }}
+        <Avatar
+          sx={{
+            m: 1,
+            bgcolor: 'primary.main',
+            cursor: 'pointer',
+          }}
+          onClick={getStarted}
         >
           <GitHubIcon />
         </Avatar>

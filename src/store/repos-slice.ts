@@ -28,7 +28,11 @@ const initialState: IReposState = {
 export const reposSlice = createSlice({
   name: 'github',
   initialState,
-  reducers: { },
+  reducers: {
+    resetRepos: (state) => {
+      state = { ...state, ...initialState };
+    },
+  },
   extraReducers: (builder) => {
     // _____FETCH CURRENT REPOS ____
     builder.addCase(fetchCurrentRepos.pending, (state) => {
@@ -59,5 +63,5 @@ export const reposSlice = createSlice({
   },
 });
 
-// export const {} = reposSlice.actions;
+export const { resetRepos } = reposSlice.actions;
 export default reposSlice.reducer;

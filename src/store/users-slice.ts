@@ -69,6 +69,9 @@ export const usersSlice = createSlice({
     closeLimit: (state) => {
       state.limit = false;
     },
+    resetUsers: (state) => {
+      state.selected = false;
+    },
   },
   extraReducers: (builder) => {
     // ______FETCH ALL USERS_____
@@ -123,5 +126,5 @@ export const usersSlice = createSlice({
   },
 });
 
-export const { changeSelected, closeLimit } = usersSlice.actions;
+export const { changeSelected, closeLimit, resetUsers } = usersSlice.actions;
 export default usersSlice.reducer;
